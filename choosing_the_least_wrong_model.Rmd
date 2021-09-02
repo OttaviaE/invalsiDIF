@@ -1,0 +1,276 @@
+---
+title: "Explore & Estimate"
+author: "Ottavia M. Epifania"
+date: "2/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = TRUE)
+library(ggplot2)
+library(TAM)
+
+pIRT = function(theta, a = 1, b = 0, c = 0,e = 1) {
+  y <- c + (e - c) * exp(a * (theta - b)) / (1 + exp(a * (theta - b)))
+  y[is.na(y)] = 1
+  return(y)
+}
+load("exploreAndEstimate.RData")
+```
+
+## Dati campione normativo 
+
+Soggetti in 2009/2010: `r nrow(item.camp)`
+
+Soggetti in 2011/2012: `r nrow(item.camp.1112.8)`
+
+Soggetti in 2012/2013: `r nrow(item.camp.1213.8)`
+
+### 1PL 
+#### Item fit
+Outfit: 
+
+```{r, message = FALSE, fig.show="hold", out.width="30%"}
+
+item.fit.0910.1pl.camp = tam.fit(pl1.camp)
+item.fit.0910.1pl.camp = item.fit.0910.1pl.camp$itemfit[, c("Outfit", "Infit")]
+item.fit.1112.1pl.camp = tam.fit(pl1.1112.8.camp)
+item.fit.1112.1pl.camp = item.fit.1112.1pl.camp$item[, c("Outfit", "Infit")]
+item.fit.1213.1pl.camp = tam.fit(pl1.1213.8.camp)
+item.fit.1213.1pl.camp = item.fit.1213.1pl.camp$item[, c("Outfit", "Infit")]
+
+boxplot(item.fit.0910.1pl.camp$Outfit, 
+        main = "2009-2010", ylim = c(0.6, 1.4))
+boxplot(item.fit.1112.1pl.camp$Outfit, 
+        main = "2011-2012", ylim = c(0.6, 1.4))
+boxplot(item.fit.1213.1pl.camp$Outfit, 
+        main = "2012-2013", ylim = c(0.6, 1.4))
+
+```
+
+
+
+Infit: 
+
+```{r, message = FALSE, fig.show="hold", out.width="30%"}
+
+boxplot(item.fit.0910.1pl.camp$Infit, 
+        main = "2009-2010", ylim = c(0.6, 1.4))
+boxplot(item.fit.1112.1pl.camp$Infit, 
+        main = "2011-2012", ylim = c(0.6, 1.4))
+boxplot(item.fit.1213.1pl.camp$Infit, 
+        main = "2012-2013", ylim = c(0.6, 1.4))
+
+```
+
+#### Item difficulties 
+
+Ci sono diverse quantità di item
+
+```{r fig.show="hold", message=FALSE, out.width="30%"}
+
+plot(theta, pIRT(theta = theta, a = item.1pl.camp[1, "B.Cat1.Dim1"],   
+                 b = item.1pl.camp[1, "xsi.item"]), 
+     type = "l", ylab = "P", main = "2009-2010")
+for (i in 2:nrow(item.1pl.camp)){
+  lines(theta, pIRT(theta = theta, a = item.1pl.camp[i, "B.Cat1.Dim1"],   
+                    b = item.1pl.camp[i, "xsi.item"]), 
+        col = colors[i])
+}
+abline(h = 0.5)
+abline(v = 0, lwd = 2, col = "black")
+abline(v= min(item.1pl.camp[, "xsi.item"]))
+abline(v= max(item.1pl.camp[, "xsi.item"]))
+mtext(round(max(item.1pl.camp[, "xsi.item"]), 2), side = 1, 
+     at = max(item.1pl.camp[, "xsi.item"]) )
+mtext(round(min(item.1pl.camp[, "xsi.item"]), 2), side = 1, 
+     at = min(item.1pl.camp[, "xsi.item"]) )
+
+# 2011-2012
+
+plot(theta, pIRT(theta = theta, 
+                 a = item.pl1.1112.8.camp[1, "B.Cat1.Dim1"],   
+                 b = item.pl1.1112.8.camp[1, "xsi.item"]), 
+     type = "l", main = "2011-2012")
+
+for (i in 2:nrow(item.pl1.1112.8.camp)){
+  lines(theta, pIRT(theta = theta, a = item.pl1.1112.8.camp[i, "B.Cat1.Dim1"],   
+                    b = item.pl1.1112.8.camp[i, "xsi.item"]), 
+        col = colors[i])
+}
+abline(h = 0.5)
+abline(v= 0, lwd = 2)
+abline(v= min(item.pl1.1112.8.camp[, "xsi.item"]))
+abline(v= max(item.pl1.1112.8.camp[, "xsi.item"]))
+mtext(round(max(item.pl1.1112.8.camp[, "xsi.item"]), 2), side = 1, 
+     at = max(item.pl1.1112.8.camp[, "xsi.item"]) )
+mtext(round(min(item.pl1.1112.8.camp[, "xsi.item"]), 2), side = 1, 
+     at = min(item.pl1.1112.8.camp[, "xsi.item"]) )
+
+
+# 2012-2013
+
+plot(theta, pIRT(theta = theta, 
+                 a = item.pl1.1213.8.camp[1, "B.Cat1.Dim1"],   
+                 b = item.pl1.1213.8.camp[1, "xsi.item"]), 
+     type = "l", main = "2012-2013")
+
+for (i in 2:nrow(item.pl1.1213.8.camp)){
+  lines(theta, pIRT(theta = theta, a = item.pl1.1213.8.camp[i, "B.Cat1.Dim1"],   
+                    b = item.pl1.1213.8.camp[i, "xsi.item"]), 
+        col = colors[i])
+}
+abline(h = 0.5)
+abline(v = 0, lwd = 3)
+abline(v= min(item.pl1.1213.8.camp[, "xsi.item"]))
+abline(v= max(item.pl1.1213.8.camp[, "xsi.item"]))
+mtext(round(max(item.pl1.1213.8.camp[, "xsi.item"]), 2), side = 1, 
+     at = max(item.pl1.1213.8.camp[, "xsi.item"]) )
+mtext(round(min(item.pl1.1213.8.camp[, "xsi.item"]), 2), side = 1, 
+     at = min(item.pl1.1213.8.camp[, "xsi.item"]) )
+                           
+```
+
+
+## Model comparison 
+
+2009-2010
+
+```{r}
+IRT.compareModels(pl1.camp, pl2.camp)$IC[, 1:7]
+
+```
+
+2011-2012
+
+```{r}
+IRT.compareModels(pl1.1112.8.camp, pl2.1112.8.camp)$IC[, 1:7]
+```
+
+2012-2013:
+
+```{r}
+IRT.compareModels(pl1.1213.8.camp, pl2.1213.8.camp)$IC[, 1:7]
+```
+
+
+#### Model fit
+
+```{r}
+data.frame(SRMR.0910 = c(fit.pl1.camp$statlist$SRMR, 
+                         fit.pl2.camp$statlist$SRMR), 
+           SRMR.a1112 = c(fit.pl1.1112.8.camp$statlist$SRMR, 
+                          fit.pl2.1112.8.camp$statlist$SRMR), 
+           SRMR.a1213 = c(fit.pl1.1213.8.camp$statlist$SRMR, 
+                          fit.pl2.1213.8.camp$statlist$SRMR), 
+           row.names = c("pl1", "pl2"))
+```
+
+Model comparison e indici di fit assoluto farebbero pensare che è meglio il 2pl. 
+
+### 2pl
+
+#### Item fit
+Outfit: 
+
+```{r, message = FALSE, fig.show="hold", out.width="30%"}
+
+item.fit.0910.2pl.camp = tam.fit(pl1.camp)
+item.fit.0910.2pl.camp = item.fit.0910.2pl.camp$itemfit[, c("Outfit", "Infit")]
+item.fit.1112.2pl.camp = tam.fit(pl1.1112.8.camp)
+item.fit.1112.2pl.camp = item.fit.1112.2pl.camp$item[, c("Outfit", "Infit")]
+item.fit.1213.2pl.camp = tam.fit(pl1.1213.8.camp)
+item.fit.1213.2pl.camp = item.fit.1213.2pl.camp$item[, c("Outfit", "Infit")]
+
+boxplot(item.fit.0910.2pl.camp$Outfit, 
+        main = "2PL-2009-2010", ylim = c(0.6, 1.4))
+boxplot(item.fit.1112.2pl.camp$Outfit, 
+        main = "2PL-2011-2012", ylim = c(0.6, 1.4))
+boxplot(item.fit.1213.2pl.camp$Outfit, 
+        main = "2PL-2012-2013", ylim = c(0.6, 1.4))
+
+```
+
+
+
+Infit: 
+
+```{r, message = FALSE, fig.show="hold", out.width="30%"}
+
+boxplot(item.fit.0910.2pl.camp$Infit, 
+        main = "2PL-2009-2010", ylim = c(0.6, 1.4))
+boxplot(item.fit.1112.2pl.camp$Infit, 
+        main = "2PL-2011-2012", ylim = c(0.6, 1.4))
+boxplot(item.fit.1213.2pl.camp$Infit, 
+        main = "2PL-2012-2013", ylim = c(0.6, 1.4))
+
+```
+
+#### Item difficulties 
+
+
+```{r fig.show="hold", message=FALSE, out.width="30%"}
+
+plot(theta, pIRT(theta = theta, a = item.2pl.camp[1, "B.Cat1.Dim1"],   
+                 b = item.2pl.camp[1, "xsi.item"]), 
+     type = "l", ylab = "P", main = "2009-2010")
+for (i in 2:nrow(item.2pl.camp)){
+  lines(theta, pIRT(theta = theta, a = item.2pl.camp[i, "B.Cat1.Dim1"],   
+                    b = item.2pl.camp[i, "xsi.item"]), 
+        col = colors[i])
+}
+abline(h = 0.5)
+abline(v = 0, lwd = 2, col = "black")
+abline(v= min(item.2pl.camp[, "xsi.item"]))
+abline(v= max(item.2pl.camp[, "xsi.item"]))
+mtext(round(max(item.2pl.camp[, "xsi.item"]), 2), side = 1, 
+     at = max(item.2pl.camp[, "xsi.item"]) )
+mtext(round(min(item.2pl.camp[, "xsi.item"]), 2), side = 1, 
+     at = min(item.2pl.camp[, "xsi.item"]) )
+
+# 2011-2012
+
+plot(theta, pIRT(theta = theta, 
+                 a = item.2pl.1112.8.camp[1, "B.Cat1.Dim1"],   
+                 b = item.2pl.1112.8.camp[1, "xsi.item"]), 
+     type = "l", main = "2011-2012")
+
+for (i in 2:nrow(item.2pl.1112.8.camp)){
+  lines(theta, pIRT(theta = theta, a = item.2pl.1112.8.camp[i, "B.Cat1.Dim1"],   
+                    b = item.2pl.1112.8.camp[i, "xsi.item"]), 
+        col = colors[i])
+}
+abline(h = 0.5)
+abline(v= 0, lwd = 2)
+abline(v= min(item.2pl.1112.8.camp[, "xsi.item"]))
+abline(v= max(item.2pl.1112.8.camp[, "xsi.item"]))
+mtext(round(max(item.2pl.1112.8.camp[, "xsi.item"]), 2), side = 1, 
+     at = max(item.2pl.1112.8.camp[, "xsi.item"]) )
+mtext(round(min(item.2pl.1112.8.camp[, "xsi.item"]), 2), side = 1, 
+     at = min(item.2pl.1112.8.camp[, "xsi.item"]) )
+
+
+# 2012-2013
+
+plot(theta, pIRT(theta = theta, 
+                 a = item.2pl.1213.8.camp[1, "B.Cat1.Dim1"],   
+                 b = item.2pl.1213.8.camp[1, "xsi.item"]), 
+     type = "l", main = "2012-2013")
+
+for (i in 2:nrow(item.2pl.1213.8.camp)){
+  lines(theta, pIRT(theta = theta, a = item.2pl.1213.8.camp[i, "B.Cat1.Dim1"],   
+                    b = item.2pl.1213.8.camp[i, "xsi.item"]), 
+        col = colors[i])
+}
+abline(h = 0.5)
+abline(v = 0, lwd = 3)
+abline(v= min(item.2pl.1213.8.camp[, "xsi.item"]))
+abline(v= max(item.2pl.1213.8.camp[, "xsi.item"]))
+mtext(round(max(item.2pl.1213.8.camp[, "xsi.item"]), 2), side = 1, 
+     at = max(item.2pl.1213.8.camp[, "xsi.item"]) )
+mtext(round(min(item.2pl.1213.8.camp[, "xsi.item"]), 2), side = 1, 
+     at = min(item.2pl.1213.8.camp[, "xsi.item"]) )
+                           
+```
+
+## Dati interi
